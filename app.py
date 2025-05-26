@@ -17,8 +17,8 @@ lb = LabelBinarizer()
 lb.fit(label_list)
 
 # ViT 모델 불러오기
-vit_model = TFViTForImageClassification.from_pretrained("models/vit_model")
-vit_processor = AutoImageProcessor.from_pretrained("models/vit_model")
+vit_model = TFViTForImageClassification.from_pretrained("vit_model")
+vit_processor = AutoImageProcessor.from_pretrained("vit_model")
 
 def preprocess_image(image):
     img = image.convert("RGB").resize((224, 224))
