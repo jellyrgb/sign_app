@@ -9,15 +9,19 @@
 </head>
 <body>
   <h1>Sign Language Predictor</h1>
-  <video id="video" width="300" height="225" autoplay></video>
+  <video id="video" width="480" height="360" autoplay></video>
   <br />
   <div style="margin: 1rem 0">
     <button class="btn" onclick="captureAndPredict()">📸 Predict with ViT</button>
   </div>
   <div id="result">✨ Prediction will appear here ✨</div>
+  <div id="history" style="margin-top: 1rem; font-size: 1.2rem;">📝 So far: </div>
 
   <script>
     const video = document.getElementById('video');
+    const historyDiv = document.getElementById('history');
+    let predictedSentence = '';  // 누적된 결과 저장
+
     navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
       video.srcObject = stream;
     });
@@ -33,11 +37,15 @@
       fetch('/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl })  // ✅ model 제거
+        body: JSON.stringify({ image: dataUrl })
       })
         .then(res => res.json())
         .then(data => {
-          document.getElementById('result').innerText = `✅ Prediction: '${data.label}'\nConfidence: ${data.confidence}`;
+          document.getElementById('result').innerText =
+            `✅ Prediction: '${data.label}'\nConfidence: ${data.confidence}`;
+          
+          predictedSentence += data.label;  // 누적
+          historyDiv.innerText = `📝 So far: ${predictedSentence}`;
         })
         .catch(err => {
           document.getElementById('result').innerText = '❌ Prediction failed.';
