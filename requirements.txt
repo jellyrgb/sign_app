@@ -1,0 +1,6 @@
+flask
+transformers
+tensorflow
+scikit-learn
+pillow
+numpy

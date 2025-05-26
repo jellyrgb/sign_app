@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Language Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <h1>Sign Language Predictor</h1>
+  <video id="video" width="300" height="225" autoplay></video>
+  <br />
+  <div style="margin: 1rem 0">
+    <button class="btn" onclick="captureAndPredict()">📸 Predict with ViT</button>
+  </div>
+  <div id="result">✨ Prediction will appear here ✨</div>
+
+  <script>
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+      video.srcObject = stream;
+    });
+
+    function captureAndPredict() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+
+      fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })  // ✅ model 제거
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('result').innerText = `✅ Prediction: '${data.label}'\nConfidence: ${data.confidence}`;
+        })
+        .catch(err => {
+          document.getElementById('result').innerText = '❌ Prediction failed.';
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
